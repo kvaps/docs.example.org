@@ -1,3 +1,6 @@
 [submodule "themes/learn"]
 	path = themes/learn
 	url = https://github.com/matcornic/hugo-theme-learn
+[submodule "deploy/gitlab-runner/vendor/gitlab-runner"]
+	path = deploy/gitlab-runner/vendor/gitlab-runner
+	url = https://gitlab.com/gitlab-org/charts/gitlab-runner
