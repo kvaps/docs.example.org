@@ -6,6 +6,12 @@
   before_script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
 
+.deploy_qbec_app:
+  stage: deploy
+  only:
+    refs:
+      - master
+
 build_toolbox:
   extends: .build_docker_image
   script:
@@ -23,3 +29,17 @@ build_website:
   only:
     refs:
       - tags
+
+deploy_gitlab_runner:
+  extends: .deploy_qbec_app
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  before_script:
+    - base64 -d "$GITCRYPT_KEY" | git-crypt unlock -
+  script:
+    - qbec apply default --root deploy/gitlab-runner --force:k8s-context __incluster__ --wait --yes
+
+deploy_website:
+  extends: .deploy_qbec_app
+  script:
+    - qbec apply default --root deploy/website --force:k8s-context __incluster__ --wait --yes
