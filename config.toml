@@ -1,0 +1,4 @@
+baseURL = "http://docs.example.org/"
+languageCode = "en-us"
+title = "My Docs Site"
+theme = "learn"
