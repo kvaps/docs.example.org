@@ -1,0 +1,10 @@
+apiVersion: qbec.io/v1alpha1
+kind: App
+metadata:
+  name: website
+spec:
+  environments:
+    default:
+      defaultNamespace: docs
+      server: https://kubernetes.example.org:8443
+  vars: {}
