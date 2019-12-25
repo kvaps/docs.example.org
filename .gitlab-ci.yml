@@ -43,6 +43,9 @@ deploy_gitlab_runner:
     - base64 -d "$GITCRYPT_KEY" | git-crypt unlock -
   script:
     - qbec apply default --root deploy/gitlab-runner --force:k8s-context __incluster__ --wait --yes
+  only:
+    changes:
+      - deploy/gitlab-runner/**/*
 
 deploy_website:
   extends: .deploy_qbec_app
