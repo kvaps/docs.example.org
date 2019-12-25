@@ -1,0 +1,7 @@
+# Indices
+- source: /content\/(.+?)_index\.(md|html)/ 
+  public: '\1'
+
+# Pages
+- source: /content\/(.+?)\.(md|html)/ 
+  public: '\1/'
