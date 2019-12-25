@@ -3,7 +3,7 @@
   components: {
     website: {
       name: 'example-docs',
-      image: 'registry.gitlab.com/kvaps/docs.example.org/website:v0.0.1',
+      image: 'registry.gitlab.com/kvaps/docs.example.org/website@' + std.extVar('digest'),
       replicas: 1,
       containerPort: 80,
       servicePort: 80,
