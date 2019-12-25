@@ -7,4 +7,7 @@ spec:
     default:
       defaultNamespace: docs
       server: https://kubernetes.example.org:8443
+    review:
+      defaultNamespace: docs
+      server: https://kubernetes.example.org:8443
   vars: {}

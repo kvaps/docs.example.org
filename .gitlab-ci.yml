@@ -30,10 +30,6 @@ build_website:
   artifacts:
     paths:
       - artifacts/
-  only:
-    refs:
-      - master
-      - tags
 
 deploy_gitlab_runner:
   extends: .deploy_qbec_app
@@ -49,6 +45,46 @@ deploy_gitlab_runner:
 
 deploy_website:
   extends: .deploy_qbec_app
+  environment:
+    name: prod
+    url: https://docs.example.org
   script:
     - DIGEST="$(cat artifacts/website.digest)"
     - qbec apply default --root deploy/website --force:k8s-context __incluster__ --wait --yes --vm:ext-str digest="$DIGEST"
+
+deploy_review:
+  extends: .deploy_qbec_app
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.docs.example.org
+    on_stop: stop_review
+  script:
+    - DIGEST="$(cat artifacts/website.digest)"
+    - qbec apply review --root deploy/website --force:k8s-context __incluster__ --wait --yes --vm:ext-str digest="$DIGEST" --vm:ext-str subdomain="$CI_ENVIRONMENT_SLUG" --app-tag "$CI_ENVIRONMENT_SLUG"
+  only:
+    refs:
+    - branches
+  except:
+    refs:
+      - master
+
+stop_review:
+  extends: .deploy_qbec_app
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  stage: deploy
+  before_script:
+    - git clone "$CI_REPOSITORY_URL" master
+    - cd master
+  script:
+    - qbec delete review --root deploy/website --force:k8s-context __incluster__ --wait --yes --vm:ext-str digest="$DIGEST" --vm:ext-str subdomain="$CI_ENVIRONMENT_SLUG" --app-tag "$CI_ENVIRONMENT_SLUG"
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+    - branches
+  except:
+    refs:
+      - master
+  when: manual
