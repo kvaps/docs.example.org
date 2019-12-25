@@ -1,0 +1,25 @@
+.build_docker_image:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug-v0.15.0
+    entrypoint: [""]
+  before_script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+
+build_toolbox:
+  extends: .build_docker_image
+  script:
+    - /kaniko/executor --cache --context $CI_PROJECT_DIR/dockerfiles/toolbox --dockerfile $CI_PROJECT_DIR/dockerfiles/toolbox/Dockerfile --destination $CI_REGISTRY_IMAGE/toolbox:$CI_COMMIT_TAG
+  only:
+    refs:
+      - tags
+
+build_website:
+  extends: .build_docker_image
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - /kaniko/executor --cache --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/dockerfiles/website/Dockerfile --destination $CI_REGISTRY_IMAGE/website:$CI_COMMIT_TAG
+  only:
+    refs:
+      - tags
